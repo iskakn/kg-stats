@@ -1,15 +1,11 @@
 import type { PageServerLoad } from './$types';
 import { getWorldBankData } from '#lib/server/worldbank';
 
-export const load: PageServerLoad = async ({ url }) => {
+export const load: PageServerLoad = async () => {
 	const data = getWorldBankData();
 
-	const requestedCode = url.searchParams.get('indicator');
 	const defaultCode = 'NY.GDP.MKTP.CD';
-	const initialIndicator =
-		(requestedCode && data.indicators.get(requestedCode)) ||
-		data.indicators.get(defaultCode) ||
-		data.featured[0];
+	const initialIndicator = data.indicators.get(defaultCode) || data.featured[0];
 
 	return {
 		countryName: data.countryName,

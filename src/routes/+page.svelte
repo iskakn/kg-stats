@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { onMount } from 'svelte';
+	import { resolve } from '$app/paths';
 	import type { PageData } from './$types';
 	import type { IndicatorFull } from '#lib/server/worldbank';
 	import { SvelteMap } from 'svelte/reactivity';
@@ -24,6 +26,14 @@
 	let activeTab = $state<'chart' | 'table' | 'meta'>('chart');
 
 	let isCopied = $state(false);
+
+	onMount(() => {
+		const params = new URLSearchParams(window.location.search);
+		const initialCode = params.get('indicator');
+		if (initialCode && initialCode !== currentIndicator.code) {
+			selectIndicator(initialCode);
+		}
+	});
 
 	function updateUrlQuery(code: string) {
 		if (typeof window === 'undefined') return;
@@ -73,7 +83,7 @@
 
 		isLoading = true;
 		try {
-			const res = await fetch(`/api/indicator/${encodeURIComponent(code)}`);
+			const res = await fetch(resolve('/api/indicator/[code]', { code }));
 			if (res.ok) {
 				const ind: IndicatorFull = await res.json();
 				clientCache.set(code, ind);

@@ -1,6 +1,13 @@
 import { json, error } from '@sveltejs/kit';
-import type { RequestHandler } from './$types';
+import type { RequestHandler, EntryGenerator } from './$types';
 import { getWorldBankData } from '#lib/server/worldbank';
+
+export const prerender = true;
+
+export const entries: EntryGenerator = () => {
+	const data = getWorldBankData();
+	return Array.from(data.indicators.keys()).map((code) => ({ code }));
+};
 
 export const GET: RequestHandler = ({ params }) => {
 	const code = params.code;
